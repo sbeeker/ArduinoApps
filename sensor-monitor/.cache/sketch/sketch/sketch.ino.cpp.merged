@@ -6,7 +6,7 @@
 #include <Arduino_Modulino.h>
 #include <Arduino_RouterBridge.h>
 
-#define TIME_INTERVAL 10000
+#define TIME_INTERVAL 20000
 
 // Create object instance for each sensor
 
