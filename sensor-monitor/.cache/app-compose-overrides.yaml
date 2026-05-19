@@ -1,0 +1,19 @@
+services:
+  dbstorage-influx:
+    user: 1000:1000
+    group_add:
+    - 44
+    - 29
+    - 991
+    - 20
+    - 1001
+    labels:
+      cc.arduino.app: "true"
+      cc.arduino.app.path: /home/arduino/ArduinoApps/sensor-monitor
+    environment:
+      APP_HOME: /home/arduino/ArduinoApps/sensor-monitor
+      BIND_ADDRESS: 127.0.0.1
+      DB_PASSWORD: Arduino15
+      DB_USERNAME: admin
+      HOST_IP: 192.168.1.207
+      INFLUXDB_ADMIN_TOKEN: 392edbf2-b8a2-481f-979d-3f188b2c05f0

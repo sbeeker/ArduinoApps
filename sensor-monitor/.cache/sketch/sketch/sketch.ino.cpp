@@ -1,0 +1,215 @@
+#include <Arduino.h>
+#line 1 "/home/arduino/ArduinoApps/sensor-monitor/sketch/sketch.ino"
+// This Arduino sketch is a compliation of numoeru sensor example sketches.  Addint each possible sendor to this sketch.
+// Long term will have conditinal compilaton to add and subtract various sensors per applicaiton.
+
+#include <Arduino_Modulino.h>
+#include <Arduino_RouterBridge.h>
+
+#define TIME_INTERVAL 10000
+
+// Create object instance for each sensor
+
+// Thermo
+ModulinoThermo thermo;
+
+// Distance
+ModulinoDistance distance;
+
+// Movement
+ModulinoMovement movement;
+
+// Light
+ModulinoLight light;
+
+unsigned long previousMillis = 0; 	// Stores last time values were updated
+
+// Setup is called once allowing for inital setup of all sensors
+#line 26 "/home/arduino/ArduinoApps/sensor-monitor/sketch/sketch.ino"
+void setup();
+#line 77 "/home/arduino/ArduinoApps/sensor-monitor/sketch/sketch.ino"
+void processThermo();
+#line 91 "/home/arduino/ArduinoApps/sensor-monitor/sketch/sketch.ino"
+void processDistance();
+#line 99 "/home/arduino/ArduinoApps/sensor-monitor/sketch/sketch.ino"
+void processMovement();
+#line 125 "/home/arduino/ArduinoApps/sensor-monitor/sketch/sketch.ino"
+void processLight();
+#line 152 "/home/arduino/ArduinoApps/sensor-monitor/sketch/sketch.ino"
+void updateSystem();
+#line 169 "/home/arduino/ArduinoApps/sensor-monitor/sketch/sketch.ino"
+void loop();
+#line 26 "/home/arduino/ArduinoApps/sensor-monitor/sketch/sketch.ino"
+void setup() {
+  
+  Bridge.begin();
+
+  // Initialize Modulino I2C communication
+  Modulino.begin(Wire1);
+
+  // initialize each sensor
+  
+  // Detect and connect to temperature/humidity sensor module
+  thermo.begin();
+
+  // Detect and connect to distance sensor module
+  distance.begin();
+
+  // Detect and connect to movement sensor module
+  movement.begin();
+
+  // Detect and connect to light sensor module
+  light.begin();
+  
+}
+
+
+// all sensor process functions in this section
+
+// declare variables to capture sensor data (would prefer not to have global variables but Arduino C)
+
+// Thermo
+float celsius = 0;
+float humidity = 0;
+
+// Distance
+int measure = 0;
+
+// Movement
+float x = 0;
+float y = 0;
+float z = 0;
+float pitch = 0;
+float roll = 0;
+float yaw = 0;
+
+// Distance
+int lux = 0;
+int luxCalibrated = 0;
+int ir = 0;
+
+// functions to process all sensors
+
+// Function to process the Modulino Thermo sensor
+void processThermo() {
+
+  // Update sensor readings
+  // thermo.update();
+  
+  // Read temperature in Celsius from the sensor
+  celsius = thermo.getTemperature();
+
+  // Read humidity percentage from the sensor
+  humidity = thermo.getHumidity();
+  
+}
+
+// Function to process the Modulino Thermo sensor
+void processDistance() {
+
+  // Read Distance from the sensor
+  measure = distance.get();
+
+}
+
+// Function to process the Modulino Movement sensor
+void processMovement() {
+
+  // Update sensor readings
+  movement.update();
+  
+  // Read X from the sensor
+  x = movement.getX();
+
+  // Read Y from the sensor
+  y = movement.getY();
+
+  // Read Z from the sensor
+  z = movement.getZ();
+
+  // Read Roll from the sensor
+  roll = movement.getRoll();
+
+  // Read Pitch from the sensor
+  pitch = movement.getPitch();
+
+  // Read Yaw from the sensor
+  yaw = movement.getYaw();
+  
+}
+
+// Function to process the Modulino Light sensor
+void processLight() {
+
+  // Update sensor readings
+  //light.update();
+  
+  // Read tambient light from the sensor
+  lux = 25;
+  // lux = getAI();
+  
+  // Read lux from the sensor
+  luxCalibrated = 30;
+  // luxCalibrated = light.getLux();
+
+  // Read IR from the sensor
+  ir = 35;
+  // ir = light.getIR();
+  
+}
+
+
+
+
+
+// send gathered sensor data to system.
+// on Bridge call per sensor
+
+// sends update of all sensor data to the applicaion 
+void updateSystem() {
+
+  // bridge call to send sensor data from sensor side to application side
+  Bridge.notify("record_thermo_samples", celsius, humidity);
+
+  // bridge call to send sensor data from sensor side to application side
+  Bridge.notify("record_distance_samples", measure);
+
+  // bridge call to send sensor data from sensor side to application side
+  Bridge.notify("record_movement_samples", x, y, z, roll, pitch, yaw);
+
+  // bridge call to send sensor data from sensor side to application side
+  Bridge.notify("record_light_samples", lux, luxCalibrated, ir);
+  
+}
+
+// Loop forever main 
+void loop() {
+
+  // get current time in milliseconds.  
+  // make sure siginficant interval has occurred.
+  unsigned long currentMillis = millis(); // Get the current time
+  if (currentMillis - previousMillis >= TIME_INTERVAL) {
+    // Save the last time you updated the values
+    previousMillis = currentMillis;
+  
+    // doing all the updates at same time so time will be closer (when add more sensors)
+    
+    // process all sensors here
+    
+    // process the Modulino Thermo sensor 
+    processThermo();
+
+    // process the Modulino Distance sensor 
+    processDistance();
+
+    // process the Modulino Movemnet sensor 
+    processMovement();
+
+    // process the Modulino Light sensor 
+    processLight();
+    
+    updateSystem();
+  }
+}
+
+
